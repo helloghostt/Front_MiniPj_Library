@@ -141,6 +141,24 @@ section 마무리 및 최적화
 
 ## 6. ERD 작성
 ```mermaid
+erDiagram
+    
+USERS {
+    int id PK "primary key"
+    varchar username "not null, unique"
+    varchar password "not null"
+    varchar email "not null, unique"
+    bool is_staff "default: false"
+    datetime date_joined "default: now()"
+}
+
+BOOKS {
+    int id PK "primary key"
+    varchar name "not null"
+    varchar location
+    varchar availability
+    text description
+}
 Table Comment {
   id integer
   message integer
@@ -148,14 +166,6 @@ Table Comment {
   post_id integer
   created_at datetime
   updated_at datetime 
-}
-
-Table Users {
-  id integer [primary key]
-  username varchar
-  email varchar
-  password varchar
-  created_at datetime
 }
 
 Table Posts {
