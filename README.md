@@ -1,75 +1,22 @@
 # Front_MiniProject_Library
+프론트엔드 미니 프로젝트
 
 ## 1. 프로젝트 목표 및 범위
 독서 커뮤니티 플랫폼으로 가입한 사용자들이 책을 중심으로 소통하고 정보를 공유할 수 있는 환경을 제공합니다.
 
-독서 목록 및 책 리뷰 커뮤니티 책 추천
-
-가입 로그인 SNS로그인 프로필  댓글 대댓글 추천 인기순
-
-
-
 * 정보 마인드맵
-```mermaid
-flowchart LR
-    classDef blue fill:#bbf,stroke:#f66,stroke-width:2px,color:white
-    classDef yellow fill:#ff9,stroke:#f66,stroke-width:2px,color:black
-    classDef green fill:#bfb,stroke:#f66,stroke-width:2px,color:black
-    classDef red fill:#fbb,stroke:#f66,stroke-width:2px,color:black
 
-    A((독서 커뮤니티<br>플랫폼)):::yellow
-
-    A---->|플랫폼|B[책 정보 DB]:::blue
-    A-->|플랫폼|B2[사용자 관리]:::blue
-    A--->|플랫폼|B3[추천 알고리즘]:::blue
-
-    A-.->|이용자|C((회원)):::green
-    C===>|기능|C1[회원가입/로그인]
-    C-->|기능|C2[프로필 설정]
-    C-->|기능|C3[책 검색/조회]
-    C-->|기능|C4[리뷰 작성]
-    C-->|기능|C5[커뮤니티 참여]
-
-    A----->|협력 업체|D>[협력사]:::red
-    D-->|종류|D1[온라인 서점]
-    D-->|종류|D2[출판사]
-    D-->|종류|D3[도서관]
-
-    A--금융-->E[(결제 시스템)]
-
-    A--화면-->F{{메인 페이지}}
-    A--화면-->F2{{회사 소개}}
-    A--화면-->F3{{회원가입/로그인}}
-    A--화면-->F4{{도서 검색/목록}}
-    A--화면-->F5{{도서 상세}}
-    A--화면-->F6{{사용자 프로필}}
-    A--화면-->F7{{커뮤니티 게시판}}
-
-    linkStyle 0 stroke:#f66,stroke-width:2px
-    linkStyle 1 stroke:#f66,stroke-width:2px
-    linkStyle 2 stroke:#f66,stroke-width:2px
-    linkStyle 3 stroke:#0f0,stroke-width:2px
-    linkStyle 8 stroke:#f00,stroke-width:2px
-
-    click A "https://example.com/platform" "플랫폼 메인으로 이동"
-    click C "https://example.com/user" "사용자 페이지로 이동"
-    click D "https://example.com/partners" "협력사 정보 보기"
-
-```
 
 * 서비스 흐름도:
-메인 페이지
-회원가입 및 로그인
-책 정보 조회 및 검색
-리뷰 작성 및 조회
-커뮤니티 활동 (게시글 작성, 댓글)
-
-추가할 예정 :책 추천 받기
-책 구매 (온라인 서점 연계)
-독서 활동 기록
-소셜 기능 (팔로우, 공유)
-
-
+메인 페이지<br>
+회원가입 및 로그인<br>
+책 정보 조회 및 검색<br>
+리뷰 작성 및 조회<br>
+커뮤니티 활동 (게시글 작성, 댓글)<br>
+추가할 예정 :책 추천 받기<br>
+책 구매 (온라인 서점 연계)<br>
+독서 활동 기록<br>
+소셜 기능 (팔로우, 공유)<br>
 
 ## 2. 기술 스택 및 배포 환경
 Html/CSS JavaScript TypeScript Node.js
