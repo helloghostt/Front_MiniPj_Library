@@ -24,8 +24,8 @@ Html/CSS JavaScript TypeScript Node.js
 ## 3. github repo, url 생성
 
 ## 4. WBS 작성 - 업무 분류 체계
-````mermaid`
-    gantt
+```mermaid
+gantt
     title 독서 커뮤니티 웹서비스 플랫폼 (1주일 프론트엔드 개발)
     dateFormat YYYY-MM-DD
     section 기획 및 설계
@@ -38,7 +38,7 @@ Html/CSS JavaScript TypeScript Node.js
     도서 검색 및 목록 페이지 구현 :2024-07-16, 1d
     도서 상세 및 리뷰 페이지 구현 :2024-07-17, 2d
     사용자 프로필 및 마이 페이지 구현 :2024-07-18, 1d
-    (추후예정) 간단한 커뮤니티 게시판 :after 구현, 1d
+    간단한 커뮤니티 게시판 구현:2024-07-18, 2d
     section 마무리 및 최적화
     반응형 디자인 적용 :2024-07-19, 1d
     기본 기능 테스트 및 버그 수정 :2024-07-20, 1d
