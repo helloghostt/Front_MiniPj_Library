@@ -2,7 +2,8 @@
 프론트엔드 미니 프로젝트
 
 ## 1. 프로젝트 목표 및 범위
-독서 커뮤니티 플랫폼으로 가입한 사용자들이 책을 중심으로 소통하고 정보를 공유할 수 있는 환경을 제공합니다.
+독서 커뮤니티 플랫폼으로 가입한 사용자들이 책을 중심으로 소통하고 정보를 공유할 수 있는 환경을 제공합니다. **Book Club** is a community for book lovers to discover, share, and discuss their favorite books.
+
 
 * 정보 마인드맵
 
@@ -19,9 +20,10 @@
 소셜 기능 (팔로우, 공유)<br>
 
 ## 2. 기술 스택 및 배포 환경
-Html/CSS JavaScript TypeScript Node.js
+Html/CSS | JavaScript | TypeScript | React | Bootstrap
 
 ## 3. github repo, url 생성
+Repo : https://github.com/helloghostt/Front_MiniPj_Library.git<br>
 
 ## 4. WBS 작성 - 업무 분류 체계
 ```mermaid
@@ -148,9 +150,28 @@ erDiagram
     COMMENT ||--o{ COMMENT : replies_to
 ```
 ## 7. 폴더구조
+Front_MiniPj_Library/
+└── mybookclub/
+    ├── public/  <!-- font -->
+    ├── src/
+    │   ├── components/  <!-- 재사용 가능한 UI컴포넌트 -->
+    │   ├── contexts/ <!-- react context api 상태 관리 로직 -->
+    │   ├── hooks/ <!-- react hook -->
+    │   ├── routes/  <!-- route 관련 component -->
+    │   │   ├── About/   <!-- 회사소개 페이지 컴포넌트 -->
+    │   │   ├── BookDetail/   <!-- 책 상세 정보 페이지 컴포넌트 -->
+    │   │   ├── Profile/     <!-- 사용자 프로필 페이지 컴포넌트 -->
+    │   │   ├── Community/     <!-- 커뮤니티 페이지 컴포넌트 -->
+    │   │   ├── Auth/   <!-- 로그인, 회원가입 페이지 컴포넌트 -->
+    │   │   ├── LandingPage/     <!-- 메인 랜딩 페이지 컴포넌트 -->
+    │   │   └── Layout/ <!-- 주요 레이아웃 컴포넌트 (헤더, 푸터, 네비게이션 등을 포함) -->
+    │   ├── services/ <!-- api -->
+    │   ├── types/  <!-- type정의  -->
+    │   ├── store/  <!-- redux 전역 상태 관리 로직 -->
+    │   └── styles/
+    └── .gitignore
 
 ## 8. URL 구조 및 페이지별 상세
-
 * 화면리스트:
 1. 최신 리뷰, 인기 도서, 추천 도서 등을 메인페이지
 2. 회사소개
@@ -162,5 +183,13 @@ erDiagram
 7. 커뮤니티 게시판 페이지 : 독서 관련 토론, 질문/답변을 위한 게시판
 
 ## 9. 느낀 점
+기한이 짧아 기능이 구현되지 못한 부분들에 대한 아쉬움이 남았습니다. 
+npm test에 대한 부분도 아쉬움이 남았습니다.
 
 ## 10. 트러블슈팅
+1. TailwindCSS is not available : 여러가지 방법으로 재설치하고 전문가에게 도움도 요청해보았으나 단순한 install문제나 설치미흡에 대한 부분이 아닌 것으로 판단되어 bootstrap을 사용하여 개발 진행
+
+
+## 11. 
+이미지는 picsum.photos, 아이콘 파인더(로고), 교보문고(책표지)에서 가져오거나 
+소장용 사진입니다.
