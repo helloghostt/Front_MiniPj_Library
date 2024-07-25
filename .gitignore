@@ -22,7 +22,11 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
+
 # 가상환경
 /venv
 /mybookclub_be
 
+# Secret key
+/.env
+/*명령어.md

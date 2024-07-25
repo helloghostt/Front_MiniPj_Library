@@ -1,43 +1,107 @@
-import React, { useState, useEffect } from 'react';
-import { useAuth } from '../../hooks/useAuth';
-
-
-interface Post {
-  id: string;
-  title: string;
-  content: string;
-  author: string;
-  createdAt: string;
-}
+import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { useAppContext } from "../../contexts/AppContext";
+import { Post } from "../../types";
+import "../../styles/global.css";
 
 const Community: React.FC = () => {
-  const [posts, setPosts] = useState<Post[]>([]);
-  const { user } = useAuth();
+  const [newPostTitle, setNewPostTitle] = useState("");
+  const [newPostContent, setNewPostContent] = useState("");
+  const {
+    auth: { currentUser },
+    community: { posts, fetchPosts, createPost, loading, error },
+  } = useAppContext();
+  const navigate = useNavigate();
 
   useEffect(() => {
-    // Fetch posts from API
-    // This is a placeholder. Replace with actual API call
-    const fetchPosts = async () => {
-      const response = await fetch('/api/posts');
-      const data = await response.json();
-      setPosts(data);
-    };
     fetchPosts();
-  }, []);
+  }, [fetchPosts]);
+
+  const handlePostSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newPostTitle.trim() || !newPostContent.trim()) return;
+    try {
+      await createPost(newPostTitle, newPostContent);
+      setNewPostTitle("");
+      setNewPostContent("");
+    } catch (error) {
+      console.error("Error creating post:", error);
+      // TODO: 에러 처리
+    }
+  };
+
+  if (loading) return <div>Loading...</div>;
+  if (error) return <div>Error: {error.message}</div>;
 
   return (
     <div className="community">
-      <h1>Community Board</h1>
-      {/* TODO: Add form to create new post */}
-      <ul>
-        {posts.map(post => (
-          <li key={post.id}>
-            <h3>{post.title}</h3>
-            <p>{post.content}</p>
-            {/* TODO: Add comments section */}
-          </li>
-        ))}
-      </ul>
+      <div className="community-board">
+        <h1>Community Board</h1>
+        <table className="discuss-board">
+          <thead>
+            <tr>
+              <th>No</th>
+              <th>Name</th>
+              <th>Title</th>
+              <th>ViewCount</th>
+            </tr>
+          </thead>
+          <tbody>
+            {posts.map((post, index) => (
+              <tr key={post.id}>
+                <td>{index + 1}</td>
+                <td>{post.author}</td>
+                <td>{post.content}</td>
+                <td>
+                  <button onClick={() => navigate(`/book/${post.id}`)}>
+                    View
+                  </button>
+                </td>
+              </tr>
+            ))}
+            {/* <tr>
+              <th>1</th>
+              <td>Admin</td>
+              <td>This is the first post on the community board.</td>
+              <td></td>
+            </tr>
+            <tr>
+              <th>2</th>
+              <td>User</td>
+              <td>This is the second post on the community board.</td>
+              <td></td>
+            </tr> */}
+          </tbody>
+        </table>
+      </div>
+      {/* 게시글 작성 폼 */}
+      {currentUser && (
+        <div className="post-form">
+          <h2>Create New Post</h2>
+          <form onSubmit={handlePostSubmit}>
+            <div>
+              <label htmlFor="postTitle">Title:</label>
+              <input
+                type="text"
+                id="postTitle"
+                value={newPostTitle}
+                onChange={(e) => setNewPostTitle(e.target.value)}
+                required
+              />
+            </div>
+            <div>
+              <label htmlFor="postContent">Content:</label>
+              <textarea
+                id="postContent"
+                value={newPostContent}
+                onChange={(e) => setNewPostContent(e.target.value)}
+                required
+              ></textarea>
+            </div>
+            <button type="submit">Submit Post</button>
+          </form>
+        </div>
+      )}
     </div>
   );
 };
