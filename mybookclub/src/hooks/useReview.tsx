@@ -1,18 +1,16 @@
-import { useState, useCallback } from "react";
-import { Review, Book } from "../types";
-import * as api from "../services/api";
-import { books as localBooks } from "../data/books";
+import { useState, useEffect, useCallback } from "react";
+import { api } from "../services/api";
+import { Review } from "../types";
 
-export const useReview = () => {
+export const useReview = (bookId: string) => {
   const [reviews, setReviews] = useState<Review[]>([]);
-  const [userReviewedBooks, setUserReviewedBooks] = useState<Book[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
 
-  const fetchReviews = useCallback(async (bookId: string) => {
+  const fetchReviews = useCallback(async () => {
+    setLoading(true);
     try {
-      setLoading(true);
-      const fetchedReviews = await api.getReviews(bookId);
+      const fetchedReviews = await api.getReviews(bookId, "", 0);
       setReviews(fetchedReviews);
       setError(null);
     } catch (err) {
@@ -20,87 +18,64 @@ export const useReview = () => {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [bookId]);
 
-  const addReview = useCallback(
-    async (bookId: string, content: string, rating: number) => {
-      try {
-        setLoading(true);
-        const newReview = await api.addReview(bookId, content, rating);
-        setReviews((prevReviews) => [...prevReviews, newReview]);
-        setError(null);
-      } catch (err) {
-        setError(err as Error);
-      } finally {
-        setLoading(false);
-      }
-    },
-    []
-  );
+  useEffect(() => {
+    fetchReviews();
+  }, [fetchReviews]);
 
-  const fetchUserReviewedBooks = useCallback(async (userId: string) => {
+  const addReview = async (content: string, rating: number) => {
     try {
       setLoading(true);
-      const userReviews = await api.getReviews(userId);
-      const reviewedBookIds = userReviews.map(
-        (review: Review) => review.bookId
-      );
-      const reviewedBooks = await Promise.all(
-        reviewedBookIds.map((id: string) => api.getBookDetails(id))
-      );
-      setUserReviewedBooks(reviewedBooks);
-      setError(null);
-    } catch (error) {
-      console.error("Error fetching user reviewed books:", error);
-      setError(error as Error);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
-  const updateReview = useCallback(
-    async (reviewId: string, content: string, rating: number) => {
-      try {
-        setLoading(true);
-        const updatedReview = await api.updateReview(reviewId, content, rating);
-        setReviews((prevReviews) =>
-          prevReviews.map((review) =>
-            review.id === reviewId ? updatedReview : review
-          )
-        );
-        setError(null);
-      } catch (err) {
-        setError(err as Error);
-      } finally {
-        setLoading(false);
-      }
-    },
-    []
-  );
-
-  const deleteReview = useCallback(async (reviewId: string) => {
-    try {
-      setLoading(true);
-      await api.deleteReview(reviewId);
-      setReviews((prevReviews) =>
-        prevReviews.filter((review) => review.id !== reviewId)
-      );
+      const newReview = await api.getReviews(bookId, content, rating);
+      setReviews((prevReviews) => [...prevReviews, newReview]);
       setError(null);
     } catch (err) {
       setError(err as Error);
     } finally {
       setLoading(false);
     }
-  }, []);
+  };
+
+  const updateReview = async (
+    reviewId: string,
+    content: string,
+    rating: number
+  ) => {
+    try {
+      setLoading(true);
+      await api.updateReview(reviewId, content, rating);
+      const updatedReviews = reviews.map((review) =>
+        review.id === reviewId ? { ...review, content, rating } : review
+      );
+      setReviews(updatedReviews);
+      setError(null);
+    } catch (err) {
+      setError(err as Error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const deleteReview = async (reviewId: string) => {
+    try {
+      setLoading(true);
+      await api.deleteReview(reviewId);
+      setReviews(reviews.filter((review) => review.id !== reviewId));
+      setError(null);
+    } catch (err) {
+      setError(err as Error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return {
     reviews,
-    userReviewedBooks,
     loading,
     error,
     fetchReviews,
     addReview,
-    fetchUserReviewedBooks,
     updateReview,
     deleteReview,
   };

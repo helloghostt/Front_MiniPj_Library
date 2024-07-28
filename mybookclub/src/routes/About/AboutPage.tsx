@@ -32,14 +32,11 @@ const About: React.FC = () => {
           zIndex: -1,
         }}
       />
-      <div
-        style={{
-          position: "relative",
-          zIndex: 1,
-        }}
-      >
+      <div className="aboutclub-container">
         <div className="aboutclub">
-          <img src="image/bookclub_logo.png" alt="logo" />
+          <div className="logo-container">
+            <img src="image/bookclub_logo.png" alt="logo" />
+          </div>
           <div className="aboutclub-info">
             <h1>About Book Club</h1>
             <p>
@@ -48,45 +45,45 @@ const About: React.FC = () => {
             </p>
           </div>
         </div>
-        <div className="slogan-container">
-          <h2>"Read. Share. Connect."</h2>
-          <div className="slogan-info">
-            <p>
-              * Reading books
-              <br />
-              * Sharing thoughts and reviews
-              <br />* Connecting with others in the community
-            </p>
-          </div>
+      </div>
+      <div className="slogan-container">
+        <h2>"Read. Share. Connect."</h2>
+        <div className="slogan-info">
+          <p>
+            * Reading books
+            <br />
+            * Sharing thoughts and reviews
+            <br />* Connecting with others in the community
+          </p>
         </div>
-        <div className="contact-container">
-          <h2>Get in touch</h2>
-          <p>We'd love to hear from you</p>
-          <Form onSubmit={handleSubmit} className="contact-form">
-            <Form.Group className="mb-3">
-              <Form.Control
-                type="email"
-                placeholder="Email address"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-              />
-            </Form.Group>
-            <Form.Group className="mb-3">
-              <Form.Control
-                as="textarea"
-                rows={3}
-                placeholder="Message"
-                value={message}
-                onChange={(e) => setMessage(e.target.value)}
-                required
-              />
-            </Form.Group>
-            <Button variant="primary" type="submit" style={{ width: "100%" }}>
-              Submit
-            </Button>
-          </Form>
-        </div>
+      </div>
+      <div className="contact-container">
+        <h2>Get in touch</h2>
+        <p>We'd love to hear from you</p>
+        <Form onSubmit={handleSubmit} className="contact-form">
+          <Form.Group className="mb-3">
+            <Form.Control
+              type="email"
+              placeholder="Email address"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+          </Form.Group>
+          <Form.Group className="mb-3">
+            <Form.Control
+              as="textarea"
+              rows={3}
+              placeholder="Message"
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
+              required
+            />
+          </Form.Group>
+          <Button variant="primary" type="submit" style={{ width: "100%" }}>
+            Submit
+          </Button>
+        </Form>
       </div>
     </div>
   );

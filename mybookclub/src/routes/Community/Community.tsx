@@ -2,20 +2,30 @@ import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAppContext } from "../../contexts/AppContext";
 import { Post } from "../../types";
+import axios from "axios";
 import "../../styles/global.css";
 
 const Community: React.FC = () => {
   const [newPostTitle, setNewPostTitle] = useState("");
   const [newPostContent, setNewPostContent] = useState("");
+  const navigate = useNavigate();
   const {
     auth: { currentUser },
     community: { posts, fetchPosts, createPost, loading, error },
   } = useAppContext();
-  const navigate = useNavigate();
 
   useEffect(() => {
     fetchPosts();
   }, [fetchPosts]);
+
+  const handleCreatePost = async (title: string, content: string) => {
+    try {
+      await createPost(title, content);
+      console.log("New post created");
+    } catch (error) {
+      console.error("Failed to create post:", error);
+    }
+  };
 
   const handlePostSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -24,6 +34,7 @@ const Community: React.FC = () => {
       await createPost(newPostTitle, newPostContent);
       setNewPostTitle("");
       setNewPostContent("");
+      fetchPosts(); // 새 게시글 생성 후 목록을 다시 불러옵니다.
     } catch (error) {
       console.error("Error creating post:", error);
       // TODO: 에러 처리
@@ -53,24 +64,12 @@ const Community: React.FC = () => {
                 <td>{post.author}</td>
                 <td>{post.content}</td>
                 <td>
-                  <button onClick={() => navigate(`/book/${post.id}`)}>
+                  <button onClick={() => navigate(`/post/${post.id}`)}>
                     View
                   </button>
                 </td>
               </tr>
             ))}
-            {/* <tr>
-              <th>1</th>
-              <td>Admin</td>
-              <td>This is the first post on the community board.</td>
-              <td></td>
-            </tr>
-            <tr>
-              <th>2</th>
-              <td>User</td>
-              <td>This is the second post on the community board.</td>
-              <td></td>
-            </tr> */}
           </tbody>
         </table>
       </div>
@@ -90,11 +89,11 @@ const Community: React.FC = () => {
               />
             </div>
             <div>
-              <label htmlFor="postContent">Content:</label>
+              <label htmlFor="postContent">Title:</label>
               <textarea
                 id="postContent"
                 value={newPostContent}
-                onChange={(e) => setNewPostContent(e.target.value)}
+                onChange={(e) => setNewPostTitle(e.target.value)}
                 required
               ></textarea>
             </div>

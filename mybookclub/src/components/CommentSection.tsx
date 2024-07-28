@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
-import { getComments, addComment } from "../services/api";
 import { CommentProps, CommentType } from "../types";
+import { api } from "../services/api";
 
 const CommentSection: React.FC<CommentProps> = ({ bookId }) => {
   const [comments, setComments] = useState<CommentType[]>([]);
@@ -14,7 +14,7 @@ const CommentSection: React.FC<CommentProps> = ({ bookId }) => {
     const fetchComments = async () => {
       if (!bookId) return;
       try {
-        const fetchedComments = await getComments(bookId);
+        const fetchedComments = await api.getComments(bookId);
         setComments(fetchedComments as CommentType[]);
       } catch (error) {
         setError("Failed to fetch comments. Please try again.");
@@ -26,16 +26,15 @@ const CommentSection: React.FC<CommentProps> = ({ bookId }) => {
     }
   }, [bookId]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmitComment = async (e: React.FormEvent) => {
     e.preventDefault();
     if (currentUser && newComment.trim() && bookId) {
       try {
-        const addedComment = await addComment(bookId, newComment);
-        setComments([...comments, addedComment as CommentType]);
+        const addedComment = await api.getComments(bookId);
+        setComments([...comments, addedComment]);
         setNewComment("");
       } catch (error) {
-        setError("Error adding comment. Please try again.");
-        console.error("Error adding comment:", error);
+        console.error("Error submitting comment:", error);
       }
     }
   };
@@ -72,7 +71,7 @@ const CommentSection: React.FC<CommentProps> = ({ bookId }) => {
         <h5 className="card-header">Leave Your Thoughts Here:</h5>
         <div className="card-body">
           {currentUser ? (
-            <form onSubmit={handleSubmit}>
+            <form onSubmit={handleSubmitComment}>
               <div className="form-group">
                 <textarea
                   className="form-control"

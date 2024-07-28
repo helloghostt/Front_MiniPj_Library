@@ -1,6 +1,6 @@
 import { useState, useCallback, useEffect } from "react";
 import { User, AuthState } from "../types";
-import { users, addUser } from "../data/users";
+import { api } from "../services/api";
 
 export const useAuth = () => {
   const [state, setState] = useState<AuthState>({
@@ -10,78 +10,75 @@ export const useAuth = () => {
   });
 
   useEffect(() => {
-    const storedUser = localStorage.getItem("currentUser");
-    if (storedUser) {
-      setState((prev) => ({ ...prev, currentUser: JSON.parse(storedUser) }));
+    const token = localStorage.getItem("accessToken");
+    if (token) {
+      fetchUserInfo();
     }
   }, []);
 
-  const login = useCallback(async (email: string) => {
-    setState((prev) => ({ ...prev, isLoading: true, error: null }));
+  const fetchUserInfo = useCallback(async () => {
     try {
-      const user = users.find((u) => u.email === email);
-      if (user) {
-        setState((prev) => ({ ...prev, currentUser: user, isLoading: false }));
-        localStorage.setItem("currentUser", JSON.stringify(user));
-        return true;
-      } else {
-        throw new Error("User not found");
-      }
-    } catch (error: unknown) {
-      setState((prev) => ({
-        ...prev,
-        error:
-          error instanceof Error ? error.message : "An unknown error occurred",
-        isLoading: false,
-      }));
-      return false;
+      setState((prev) => ({ ...prev, isLoading: true }));
+      const user = await api.getCurrentUser();
+      setState((prev) => ({ ...prev, currentUser: user, isLoading: false }));
+    } catch (error) {
+      console.error("Error fetching user info:", error);
+      logout();
     }
   }, []);
+
+  const setIsLoading = (isLoading: boolean) => {
+    setState((prev) => ({ ...prev, isLoading }));
+  };
+
+  const setError = (error: string | null) => {
+    setState((prev) => ({ ...prev, error }));
+  };
+
+  const login = async (email: string) => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const { user, access, refresh } = await api.login(email);
+      localStorage.setItem("accessToken", access);
+      localStorage.setItem("refreshToken", refresh);
+      api.setAuthToken(access);
+      setState((prev) => ({ ...prev, currentUser: user, isLoading: false }));
+      return true;
+    } catch (error) {
+      setError("Failed to login");
+      setIsLoading(false);
+      return false;
+    }
+  };
 
   const logout = useCallback(() => {
     setState({ currentUser: null, isLoading: false, error: null });
-    localStorage.removeItem("currentUser");
+    localStorage.removeItem("accessToken");
+    localStorage.removeItem("refreshToken");
+    api.removeAuthToken();
   }, []);
 
-  const isAdmin = useCallback(() => {
-    return state.currentUser?.role === "admin";
-  }, [state.currentUser]);
+  const isAdmin = () => state.currentUser?.role === "admin";
 
-  const signUp = useCallback(async (email: string) => {
-    setState((prev) => ({ ...prev, isLoading: true, error: null }));
+  const signUp = async (email: string) => {
+    setIsLoading(true);
+    setError(null);
     try {
-      if (!email) {
-        throw new Error("Email is required");
-      }
-      if (!email.includes("@")) {
-        throw new Error("Invalid email format");
-      }
-
-      if (users.some((u) => u.email === email)) {
-        throw new Error("Email already exists");
-      }
-      const newUser: User = {
-        id: (users.length + 1).toString(),
-        email,
-        username: email.split("@")[0],
-        createdAt: new Date().toISOString(),
-        role: "user",
-      };
-
-      addUser(newUser);
-      setState((prev) => ({ ...prev, currentUser: newUser, isLoading: false }));
-      localStorage.setItem("currentUser", JSON.stringify(newUser));
+      const { user, access, refresh } = await api.signUp(email);
+      localStorage.setItem("accessToken", access);
+      localStorage.setItem("refreshToken", refresh);
+      api.setAuthToken(access);
+      setState((prev) => ({ ...prev, currentUser: user, isLoading: false }));
       return true;
-    } catch (error: unknown) {
-      setState((prev) => ({
-        ...prev,
-        error:
-          error instanceof Error ? error.message : "An unknown error occurred",
-        isLoading: false,
-      }));
+    } catch (error) {
+      setError(
+        error instanceof Error ? error.message : "An unknown error occurred"
+      );
+      setIsLoading(false);
       return false;
     }
-  }, []);
+  };
 
   return {
     ...state,
@@ -89,5 +86,6 @@ export const useAuth = () => {
     logout,
     isAdmin,
     signUp,
+    api,
   };
 };

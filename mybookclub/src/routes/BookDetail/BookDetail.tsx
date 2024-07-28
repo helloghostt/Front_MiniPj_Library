@@ -27,7 +27,7 @@ const BookDetail: React.FC = () => {
   useEffect(() => {
     if (id) {
       fetchBookDetails(id);
-      fetchReviews(id);
+      fetchReviews();
     }
   }, [id, fetchBookDetails, fetchReviews]);
 
@@ -47,7 +47,7 @@ const BookDetail: React.FC = () => {
           await updateReview(editingReviewId, newReview, rating);
           setEditingReviewId(null);
         } else {
-          await addReview(id, newReview, rating);
+          await addReview(newReview, rating);
         }
         setNewReview("");
         setRating(5);
@@ -58,9 +58,9 @@ const BookDetail: React.FC = () => {
   };
 
   const handleEditReview = (review: Review) => {
+    setEditingReviewId(review.id);
     setNewReview(review.content);
     setRating(review.rating);
-    setEditingReviewId(review.id);
   };
 
   const handleDeleteReview = async (reviewId: string) => {

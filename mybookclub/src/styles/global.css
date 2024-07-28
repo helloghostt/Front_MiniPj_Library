@@ -178,23 +178,26 @@ select {
   display: inline-block;
   align-items: center;
   border: solid 1px rgba(9, 9, 225, 0.5);
-  border-radius: 4px;
+  border-radius: 10px;
   margin-right: 10px;
-  width: 50px;
+  height: 40px;
 }
+.bookclub_logo img:hover {
+  transform: scale(1.2);
+}
+
 .custom-navbar {
   /* 네비게이션 바 스타일 */
-
   background-color: var(--background-color);
 }
+
 .search-form {
   width: 300px;
 }
-/* .custom-search-input {/* 검색 입력 필드 스타일 */
 
-/*} */
+/* 사용자 아이콘 스타일 */
+
 .user-icon a {
-  /* 사용자 아이콘 스타일 */
   display: flex;
   align-items: center;
   justify-content: center;
@@ -204,18 +207,14 @@ select {
   background-color: rgba(255, 255, 255, 0.1);
   transition: background-color 0.3s ease;
 }
+
 .user-icon a:hover {
   background-color: rgba(255, 255, 255, 0.2);
 }
 
-@media (max-width: 991px) {
+@media (max-width: 767px) {
   .navbar-collapse {
     text-align: center;
-  }
-
-  .navbar-nav {
-    margin-left: 0 !important;
-    margin-right: 0 !important;
   }
 
   .search-form {
@@ -224,8 +223,22 @@ select {
   }
 
   .user-icon {
-    justify-content: center;
+    position: absolute;
+    top: 10px;
+    right: 50px;
   }
+
+  /* .navbar-toggler {
+    order: 1;
+  }
+
+  .bookclub_logo {
+    order: 2;
+  }
+
+  .user-icon {
+    order: 3;
+  } */
 }
 
 @media (max-width: 575px) {
@@ -283,29 +296,71 @@ select {
 }
 
 /* About Page */
+.aboutclub-container {
+  width: 100%;
+  max-width: 500px;
+  margin: 80px auto 0; /* header 높이에 맞게 조정 */
+  padding: 0 20px;
+}
+
 .About {
   background-color: "black";
   color: "lightgrey";
-  padding: "20px";
+  padding: "10px";
   position: "relative";
   min-height: "100vh";
   overflow: "hidden";
+  min-width: 550px;
 }
 
 .aboutclub {
-  display: inline-flex;
+  display: flex;
+  flex-direction: row;
   align-items: center;
-  text-align: left;
-  margin-top: 50px;
+  text-align: center;
   gap: 20px;
 }
 
-.aboutclub img {
-  width: 200px;
-  height: "auto";
-  margin-bottom: "20px";
+.aboutclub-info h1 {
+  font-size: 1.5em;
+  margin-bottom: 10px;
 }
 
+.aboutclub-info p {
+  background: linear-gradient(90deg, #ff9a9e 0%, #fad0c4 100%);
+  background-size: 200% 100%;
+  color: white;
+  border-radius: 5px;
+  animation: slideBackground 5s ease infinite;
+  animation-delay: 10s;
+}
+
+@keyframes slideBackground {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.logo-container {
+  width: 100%;
+  max-width: 200px;
+}
+.logo-container img {
+  min-width: 100px;
+  width: 100%;
+  height: auto;
+  margin-bottom: 20px;
+}
+
+.logo-container img:hover {
+  transform: scale(1.1);
+}
 .slogan-container {
   display: flex;
   flex-direction: column;
@@ -313,40 +368,98 @@ select {
   width: 100%;
   max-width: 500px;
   margin: 0 auto;
-  margin-top: 50px;
+  margin-top: 20px;
 }
 
 .slogan-container h2 {
   align-self: center;
   text-align: center;
   width: 100%;
+  display: inline-block;
+  overflow: hidden;
+  border-right: 0.15em solid orange; /* 커서 효과 */
+  white-space: nowrap;
+  margin: 0 auto;
+  letter-spacing: 0.15em;
+  animation: typing 3.5s steps(40, end), blink-caret 0.75s step-end infinite 0s,
+    hideCaret 0s step-end forwards 3s; /* 3초 후 커서 숨기기 */
+}
+
+@keyframes typing {
+  from {
+    width: 0;
+  }
+  to {
+    width: 100%;
+  }
+}
+@keyframes blink-caret {
+  from,
+  to {
+    border-color: transparent;
+  }
+  50% {
+    border-color: orange;
+  }
+}
+@keyframes hideCaret {
+  to {
+    border-color: transparent;
+  }
 }
 
 .slogan-info {
   align-self: flex-start;
   text-align: left;
   width: 100%;
-  padding-left: 30px; /* 왼쪽 여백 조정 */
+  padding-left: 0; /* 왼쪽 여백 조정 */
   box-sizing: border-box;
   font-size: 1.5em;
+  margin-top: 30px;
   margin-bottom: 50px;
+  visibility: hidden;
+  opacity: 0;
+  animation: fadeIn 1s ease-in forwards 1s;
+}
+@keyframes fadeIn {
+  from {
+    visibility: hidden;
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    visibility: visible;
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @media (min-width: 768px) {
-  .slogan-container {
-    padding: 0 20px; /* 양쪽 여백 추가 */
+  .aboutclub {
+    flex-direction: row;
+    align-items: center;
+    text-align: left;
   }
 
-  .slogan-info {
-    padding-left: calc(50% - 400px + 20px); /* 중앙 정렬을 위한 계산 */
+  .logo-container {
+    flex: 4;
+    max-width: none;
+  }
+
+  .aboutclub-info {
+    flex: 6;
   }
 }
 
 .contact-container {
-  max-width: "500px";
+  max-width: 500px;
+  margin: 0 auto;
+  padding: 20px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
 }
 .contact-form {
-  width: "300px";
+  width: 100%;
 }
 
 /* Profile Page */
@@ -483,7 +596,15 @@ Button {
 
 /* homepage */
 .search-box {
-  margin-bottom: 20px;
-  align-items: center;
   display: flex;
+  align-items: center;
+  gap: 10px; /* Form.Control과 Button 사이의 간격 */
+}
+
+.search-box .form-control {
+  flex-grow: 1; /* 남은 공간을 Form.Control이 차지하도록 */
+}
+
+.search-box .btn {
+  white-space: nowrap; /* 버튼 텍스트가 줄 바꿈되지 않도록 */
 }

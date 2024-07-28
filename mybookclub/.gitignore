@@ -26,5 +26,6 @@ yarn-error.log*
 # 가상환경
 /.venv
 
-
+/data/books.tsx
+/data/users.tsx
 /*명령어.md

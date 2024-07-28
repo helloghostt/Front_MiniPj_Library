@@ -1,25 +1,14 @@
 import React, { createContext, useContext, ReactNode } from "react";
 import { useAuth } from "../hooks/useAuth";
-import useBook from "../hooks/useBook";
+import { useBook } from "../hooks/useBook";
 import { useReview } from "../hooks/useReview";
 import { useCommunity } from "../hooks/useCommunity";
-import { Book } from "../types";
+import { Book, Review } from "../types";
 
 interface AppContextType {
   auth: ReturnType<typeof useAuth>;
   community: ReturnType<typeof useCommunity>;
-  book: {
-    books: Book[];
-    loading: boolean;
-    error: Error | null;
-    readingList: Book[];
-    searchBooks: (query: string) => Promise<void>;
-    addToReadingList: (userId: string, bookId: string) => Promise<void>;
-    fetchReadingList: (userId: string) => Promise<void>;
-    fetchBooks: () => Promise<void>;
-    fetchBookDetails: (bookId: string) => Promise<void>;
-    fetchUserReviewedBooks: (userId: string) => Promise<Book[]>;
-  };
+  book: ReturnType<typeof useBook>;
   review: ReturnType<typeof useReview>;
 }
 
@@ -30,7 +19,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({
 }) => {
   const auth = useAuth();
   const book = useBook();
-  const review = useReview();
+  const review = useReview("");
   const community = useCommunity();
 
   return (

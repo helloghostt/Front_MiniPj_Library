@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import {
   Navbar,
@@ -41,6 +41,26 @@ const Header: React.FC = () => {
   const [expanded, setExpanded] = useState(false);
   const navigate = useNavigate();
   const { currentUser, isAdmin } = useAuth();
+  const navbarRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        navbarRef.current &&
+        !navbarRef.current.contains(event.target as Node)
+      ) {
+        setExpanded(false);
+      }
+    };
+
+    if (expanded) {
+      document.addEventListener("click", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("click", handleClickOutside);
+    };
+  }, [expanded]);
 
   const handleNavClick = (path: string) => {
     navigate(path);
@@ -58,15 +78,12 @@ const Header: React.FC = () => {
       variant="dark"
       expand="md"
       expanded={expanded}
-      onToggle={(expanded) => setExpanded(expanded)}
+      onToggle={setExpanded}
       fixed="top"
+      ref={navbarRef}
     >
-      <Container>
-        <Navbar.Brand
-          as="div"
-          onClick={handleLogoClick}
-          style={{ cursor: "pointer" }}
-        >
+      <Container className="flex flex-row">
+        <Navbar.Brand as="div" onClick={handleLogoClick}>
           <div className="bookclub_logo">
             <img src="/image/bookclub_logo.png" alt="BookClub Logo" />
           </div>
@@ -74,30 +91,39 @@ const Header: React.FC = () => {
 
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
 
-        <Navbar.Collapse id="basic-navbar-nav">
+        <Navbar.Collapse id="basic-navbar-nav" className="remove-between">
           <Nav className="ms-auto">
-            <Nav.Link as={Link} to="/about">
+            <Nav.Link
+              as={Link}
+              to="/about"
+              onClick={() => handleNavClick("/about")}
+            >
               About
             </Nav.Link>
             {currentUser && (
-              <Nav.Link as={Link} to="/community">
+              <Nav.Link
+                as={Link}
+                to="/community"
+                onClick={() => handleNavClick("/community")}
+              >
                 Community
               </Nav.Link>
             )}
           </Nav>
           {currentUser && <SearchBar />}
         </Navbar.Collapse>
-
-        {currentUser && (
-          <div className="user-icon ms-2">
-            <Link to="/profile">
-              <i
-                className="bi bi-person-circle"
-                style={{ fontSize: "1.5rem" }}
-              ></i>
-            </Link>
-          </div>
-        )}
+        <Navbar.Brand>
+          {currentUser && (
+            <div className="user-icon ms-2">
+              <Link to="/profile" onClick={() => setExpanded(false)}>
+                <i
+                  className="bi bi-person-circle"
+                  style={{ fontSize: "1.5rem" }}
+                ></i>
+              </Link>
+            </div>
+          )}
+        </Navbar.Brand>
       </Container>
     </Navbar>
   );

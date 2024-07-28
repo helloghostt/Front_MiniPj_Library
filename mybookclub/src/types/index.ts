@@ -83,3 +83,11 @@ export interface AuthState {
   isLoading: boolean;
   error: string | null;
 }
+
+export interface SearchResult {
+  isbn: string;
+  title: string;
+  author: string;
+  image: string;
+  description: string;
+}

@@ -27,6 +27,22 @@ yarn-error.log*
 /venv
 /mybookclub_be
 
+### Django ###
+.env
+*.log
+*.pot
+*.pyc
+__pycache__/
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+media
+*/migrations/
+!*/migrations/__init__.py
+
 # Secret key
 /.env
 /*명령어.md
+
+/data/books.tsx
+/data/users.tsx
