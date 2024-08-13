@@ -25,7 +25,7 @@ yarn-error.log*
 
 # 가상환경
 /venv
-/mybookclub_be
+
 
 ### Django ###
 .env
@@ -39,6 +39,7 @@ db.sqlite3-journal
 media
 */migrations/
 !*/migrations/__init__.py
+
 
 # Secret key
 /.env

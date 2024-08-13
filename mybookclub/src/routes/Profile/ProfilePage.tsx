@@ -9,9 +9,10 @@ import { Book } from "../../types";
 const Profile: React.FC = () => {
   const {
     auth: { currentUser, logout, isAdmin },
-    book: { fetchUserReviewedBooks, loading },
+    book: { fetchUserReviewedBooks },
   } = useAppContext();
   const [userReviewedBooks, setUserReviewedBooks] = useState<Book[]>([]);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
 
@@ -19,11 +20,14 @@ const Profile: React.FC = () => {
     const loadUserReviewedBooks = async () => {
       if (currentUser) {
         try {
+          setLoading(true);
           const books = await fetchUserReviewedBooks(currentUser.id);
           setUserReviewedBooks(books);
           setError(null);
         } catch (err) {
           setError("Failed to load reviewed books. Please try again.");
+        } finally {
+          setLoading(false);
         }
       }
     };

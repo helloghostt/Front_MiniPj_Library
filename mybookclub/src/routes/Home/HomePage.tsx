@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+// import Pagination from 'react-js-pagination';
 import {
   Button,
   Container,
@@ -19,18 +19,42 @@ import { api } from "../../services/api";
 
 const HomePage: React.FC = () => {
   const {
-    book: { books, loading, error, searchBooks },
+    book: { searchBooks },
   } = useAppContext();
-  const [query, setQuery] = useState("");
-  const [hasSearched, setHasSearched] = useState(false);
-  const [currentPage, setCurrentPage] = useState(1);
-  const { fetchBooks } = useBook();
-  const booksPerPage = 20;
 
+  // 로컬 상태 관리
+  const [query, setQuery] = useState(""); // 검색 쿼리
+  const [hasSearched, setHasSearched] = useState(false); // 검색 수행 여부
+  const [currentPage, setCurrentPage] = useState(1); // 현재 페이지 번호
+  const [books, setBooks] = useState<Book[]>([]); // 책 목록
+  const [loading, setLoading] = useState(true); // 로딩 상태
+  const [error, setError] = useState<Error | null>(null); // 로컬 에러 상태
+
+  const { fetchBooks, totalPages } = useBook(); // 책 데이터를 가져오는 커스텀 훅
+  const booksPerPage = 20; // 페이지당 표시할 책 수
+
+  // 컴포넌트 마운트 시 책 데이터를 가져옵니다
   useEffect(() => {
-    fetchBooks();
+    setLoading(true);
+    fetchBooks()
+      .then((data) => {
+        if (Array.isArray(data)) {
+          setBooks(data);
+        } else {
+          console.error("Fetched data is not an array:", data);
+          throw new Error("Fetched data is not an array");
+        }
+      })
+      .catch((err) => {
+        console.error("Error fetching books:", err);
+        setError(err);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
   }, [fetchBooks]);
 
+  // 검색 폼 제출 핸들러
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
     setHasSearched(true);
@@ -38,14 +62,26 @@ const HomePage: React.FC = () => {
     await searchBooks(query);
   };
 
+  const handlePageChange = (pageNumber: number) => {
+    setCurrentPage(pageNumber);
+    if (hasSearched) {
+      searchBooks(query, pageNumber);
+    } else {
+      fetchBooks(pageNumber);
+    }
+  };
+
+  // 페이지네이션을 위한 현재 페이지의 책 목록 계산
   const indexOfLastBook = currentPage * booksPerPage;
   const indexOfFirstBook = indexOfLastBook - booksPerPage;
   const currentBooks = books.slice(indexOfFirstBook, indexOfLastBook);
 
+  // 페이지 변경 함수
   const paginate = (pageNumber: number) => setCurrentPage(pageNumber);
 
+  // 책 목록 렌더링 함수
   const renderBooks = () => {
-    if (books.length === 0) {
+    if (books.length === 0 && !loading && !error) {
       return <Alert variant="info">No books found matching your search.</Alert>;
     }
     return (
@@ -64,9 +100,10 @@ const HomePage: React.FC = () => {
     );
   };
 
+  // 페이지네이션 컴포넌트 렌더링 함수
   const renderPagination = () => {
     const pageNumbers = [];
-    for (let i = 1; i <= Math.ceil(books.length / booksPerPage); i++) {
+    for (let i = 1; i <= totalPages; i++) {
       pageNumbers.push(
         <Pagination.Item
           key={i}
@@ -80,6 +117,7 @@ const HomePage: React.FC = () => {
     return <Pagination>{pageNumbers}</Pagination>;
   };
 
+  // 컴포넌트 UI 렌더링
   return (
     <Container className="home-page">
       <h1 className="text-center my-4">🌱 BookList 🌱</h1>
@@ -91,7 +129,9 @@ const HomePage: React.FC = () => {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
           />
-          <Button type="submit"> Search</Button>
+          <Button type="submit" disabled={loading}>
+            {loading ? "Searching..." : "Search"}
+          </Button>
         </div>
       </Form>
 
@@ -108,6 +148,7 @@ const HomePage: React.FC = () => {
           {error.stack}
         </Alert>
       ) : (
+        // 책 목록 및 페이지네이션 표시
         <div className="book-list">
           <h2 className="text-center mb-4">Search Results</h2>
           {renderBooks()}

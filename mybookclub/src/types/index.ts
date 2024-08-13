@@ -18,7 +18,9 @@ export interface Book {
   title: string;
   author: string;
   coverImage: string;
+  isbn: string;
   description?: string;
+  published_date: string;
 }
 
 export interface BookCardProps {
@@ -90,4 +92,11 @@ export interface SearchResult {
   author: string;
   image: string;
   description: string;
+}
+
+export interface PaginatedResponse<T> {
+  count: number;
+  next: string | null;
+  previous: string | null;
+  results: T[];
 }

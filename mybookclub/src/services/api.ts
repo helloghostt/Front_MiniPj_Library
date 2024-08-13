@@ -3,6 +3,9 @@ import { Book, Review, Post, Comment, User } from "../types";
 
 const API_URL = process.env.REACT_APP_API_URL || "http://localhost:8000/api";
 
+const NAVER_CLIENT_ID = process.env.REACT_APP_NAVER_CLIENT_ID;
+const NAVER_CLIENT_SECRET = process.env.REACT_APP_NAVER_CLIENT_SECRET;
+
 const axiosInstance = axios.create({
   baseURL: API_URL,
 });
@@ -26,6 +29,7 @@ interface ApiClient {
   ) => Promise<{ user: User; access: string; refresh: string }>;
   getCurrentUser: () => Promise<User>;
   fetchBooks: () => Promise<Book[]>;
+  fetchBookByISBN: () => Promise<Book[]>;
   getBookDetails: (bookId: string) => Promise<Book>;
   getReviews: (bookId: string) => Promise<Review[]>;
   createReview: (
@@ -63,21 +67,56 @@ export const api = {
 
   login: async (email: string) => {
     try {
-      const response = await axiosInstance.post("/auth/login/", { email });
-      const data = response.data;
-      return {
-        user: data.user,
-        access: data.access,
-        refresh: data.refresh,
-      };
+      const response = await axiosInstance.post("/users/auth/login/", {
+        email: email,
+      });
+      console.log("Login response:", response.data);
+      return response.data;
     } catch (error) {
-      console.error("Login error:", error);
-      throw error;
+      if (axios.isAxiosError(error)) {
+        console.error(
+          "Login API error:",
+          error.response?.data || error.message
+        );
+        if (error.response) {
+          // 서버에서 응답을 받았지만 2xx 범위를 벗어난 상태 코드가 반환된 경우
+          switch (error.response.status) {
+            case 400:
+              throw new Error(
+                error.response.data.error || "Invalid credentials"
+              );
+            case 401:
+              throw new Error("Unauthorized. Please check your credentials.");
+            case 404:
+              throw new Error(
+                "Login service not found. Please try again later."
+              );
+            default:
+              throw new Error(
+                `Server error: ${
+                  error.response.data.error || "Unknown error occurred"
+                }`
+              );
+          }
+        } else if (error.request) {
+          // 요청은 보냈지만 응답을 받지 못한 경우
+          throw new Error(
+            "No response from server. Please check your network connection."
+          );
+        } else {
+          // 요청 설정 중에 문제가 발생한 경우
+          throw new Error("Error setting up the request. Please try again.");
+        }
+      } else {
+        // 예상치 못한 오류
+        console.error("Unexpected error during login:", error);
+        throw new Error("An unexpected error occurred. Please try again.");
+      }
     }
   },
 
   signUp: async (email: string) => {
-    const response = await axiosInstance.post("/auth/signup/", { email });
+    const response = await axiosInstance.post("/users/auth/signup/", { email });
     return response.data;
   },
 
@@ -86,9 +125,33 @@ export const api = {
     return response.data;
   },
 
-  fetchBooks: async () => {
-    const response = await axiosInstance.get("/books/");
-    return response.data;
+  fetchBooks: async (page: number = 1): Promise<Book[]> => {
+    try {
+      const response = await axiosInstance.get(`/books/?page=${page}`);
+      console.log("API response:", response.data);
+      if (response.data.results) {
+        return response.data.results;
+      }
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching books:", error);
+      throw error;
+    }
+  },
+
+  fetchBookByISBN: async (isbn: string): Promise<Book | null> => {
+    try {
+      const response = await axiosInstance.get(`/books/fetchbooks/${isbn}/`, {
+        headers: {
+          "X-Naver-Client-Id": NAVER_CLIENT_ID,
+          "X-Naver-Client-Secret": NAVER_CLIENT_SECRET,
+        },
+      });
+      return response.data;
+    } catch (error) {
+      console.error("Error fetching book info:", error);
+      return null;
+    }
   },
 
   getBookDetails: async (bookId: string) => {
@@ -97,17 +160,22 @@ export const api = {
   },
 
   addToReadingList: async (userId: string, bookId: string) => {
-    const response = await axiosInstance.post(`/profile/${userId}`);
+    const response = await axiosInstance.post(
+      `/users/${userId}/reading-list/`,
+      { book_id: bookId }
+    );
     return response.data;
   },
 
   getReadingList: async (userId: string) => {
-    const response = await axiosInstance.get(`/profile/${userId}`);
+    const response = await axiosInstance.get(`/users/${userId}/reading-list/`);
     return response.data;
   },
 
-  searchBooks: async (query: string) => {
-    const response = await axiosInstance.get(`/search/?query=${query}`);
+  searchBooks: async (query: string, page: number = 1) => {
+    const response = await axiosInstance.get(
+      `/books/search/?query=${query}&page=${page}`
+    );
     return response.data;
   },
 
@@ -131,11 +199,14 @@ export const api = {
   },
 
   deletePost: async (id: string) => {
-    await axiosInstance.delete(`/posts/${id}`);
+    await axiosInstance.delete(`/posts/${id}/`);
   },
 
   // Review CRUD
-  getReviews: async (bookId: string, content: string, rating: number) => {
+  getReviews: async (bookId: string) => {
+    if (!bookId) {
+      throw new Error("Book ID is required");
+    }
     const response = await axiosInstance.get(`/books/${bookId}/reviews/`);
     return response.data;
   },
@@ -149,7 +220,7 @@ export const api = {
   },
 
   updateReview: async (reviewId: string, content: string, rating: number) => {
-    const response = await axiosInstance.put(`/reviews/${reviewId}/`, {
+    const response = await axiosInstance.put(`/books/reviews/${reviewId}/`, {
       content,
       rating,
     });
@@ -157,13 +228,7 @@ export const api = {
   },
 
   deleteReview: async (reviewId: string) => {
-    await axiosInstance.delete(`/reviews/${reviewId}/`);
-  },
-
-  addReview: async (reviewId: string) => {
-    await axiosInstance.put(`/reviews/${reviewId}/add`, {
-      reviewId,
-    });
+    await axiosInstance.delete(`/books/reviews/${reviewId}/`);
   },
 
   // Comment CRUD

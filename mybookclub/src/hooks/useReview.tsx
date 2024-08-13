@@ -10,7 +10,7 @@ export const useReview = (bookId: string) => {
   const fetchReviews = useCallback(async () => {
     setLoading(true);
     try {
-      const fetchedReviews = await api.getReviews(bookId, "", 0);
+      const fetchedReviews = await api.getReviews(bookId);
       setReviews(fetchedReviews);
       setError(null);
     } catch (err) {
@@ -27,7 +27,7 @@ export const useReview = (bookId: string) => {
   const addReview = async (content: string, rating: number) => {
     try {
       setLoading(true);
-      const newReview = await api.getReviews(bookId, content, rating);
+      const newReview = await api.getReviews(bookId);
       setReviews((prevReviews) => [...prevReviews, newReview]);
       setError(null);
     } catch (err) {

@@ -46,7 +46,8 @@ export const useAuth = () => {
       setState((prev) => ({ ...prev, currentUser: user, isLoading: false }));
       return true;
     } catch (error) {
-      setError("Failed to login");
+      console.error("Login error:", error);
+      setError(error instanceof Error ? error.message : "Failed to login");
       setIsLoading(false);
       return false;
     }

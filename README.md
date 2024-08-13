@@ -82,67 +82,82 @@ gantt
 
 ```mermaid
 erDiagram
-    USER {
-        int id PK
-        varchar username
-        varchar email
-        varchar password_hash
-        datetime created_at
-        datetime last_login
-    }
 
-    BOOK {
-        int id PK
-        varchar title
-        varchar author
-        varchar isbn
-        varchar publisher
-        date publication_date
-        text description
-    }
+Table Users {
+  id integer [primary key]
+  username varchar
+  email varchar
+  password varchar
+  created_at timestamp
+  updated_at timestamp
+}
 
-    REVIEW {
-        int id PK
-        int user_id FK
-        int book_id FK
-        text content
-        int rating
-        datetime created_at
-    }
+Table Books {
+  id integer [primary key]
+  title varchar
+  author varchar
+  isbn varchar
+  publication_year integer
+  created_at timestamp
+  updated_at timestamp
+}
 
-    COMMUNITY_POST {
-        int id PK
-        int user_id FK
-        varchar title
-        text content
-        datetime created_at
-    }
+Table BookClubs {
+  id integer [primary key]
+  name varchar
+  description text
+  creator_id integer
+  created_at timestamp
+  updated_at timestamp
+}
 
-    COMMUNITY_COMMENT {
-        int id PK
-        int user_id FK
-        int post_id FK
-        int parent_comment_id FK
-        text content
-        datetime created_at
-    }
+Table Memberships {
+  id integer [primary key]
+  user_id integer
+  bookclub_id integer
+  role varchar
+  created_at timestamp
+  updated_at timestamp
+}
 
-    READING_LIST {
-        int id PK
-        int user_id FK
-        int book_id FK
-        enum status
-        datetime created_at
-    }
+Table ReadingLists {
+  id integer [primary key]
+  bookclub_id integer
+  book_id integer
+  start_date date
+  end_date date
+  created_at timestamp
+  updated_at timestamp
+}
 
-    USER ||--o{ REVIEW : writes
-    USER ||--o{ COMMUNITY_POST : creates
-    USER ||--o{ COMMUNITY_COMMENT : writes
-    USER ||--o{ READING_LIST : has
-    BOOK ||--o{ REVIEW : receives
-    BOOK ||--o{ READING_LIST : included_in
-    COMMUNITY_POST ||--o{ COMMUNITY_COMMENT : has
-    COMMUNITY_COMMENT ||--o{ COMMUNITY_COMMENT : replies_to
+Table Posts {
+  id integer [primary key]
+  title varchar
+  content text [note: 'Content of the post']
+  author_id integer
+  bookclub_id integer
+  created_at timestamp
+  updated_at timestamp
+}
+
+Table Comments {
+  id integer [primary key]
+  content text
+  author_id integer
+  post_id integer
+  created_at timestamp
+  updated_at timestamp
+}
+
+Ref: Users.id < BookClubs.creator_id
+Ref: Users.id < Memberships.user_id
+Ref: BookClubs.id < Memberships.bookclub_id
+Ref: BookClubs.id < ReadingLists.bookclub_id
+Ref: Books.id < ReadingLists.book_id
+Ref: Users.id < Posts.author_id
+Ref: BookClubs.id < Posts.bookclub_id
+Ref: Users.id < Comments.author_id
+Ref: Posts.id < Comments.post_id
 ```
 
 <br>
