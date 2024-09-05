@@ -1,8 +1,5 @@
 # Front_MiniProject_Library
 
-프론트엔드 미니 프로젝트
-<br>
-
 ## 1. 프로젝트 목표 및 범위
 
 독서 커뮤니티 플랫폼으로 가입한 사용자들이 책을 중심으로 소통하고 정보를 공유할 수 있는 환경을 제공합니다.<br> **BookClub** is a community for book lovers to discover, share, and discuss their favorite books.<br>
