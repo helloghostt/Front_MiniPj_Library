@@ -10,6 +10,8 @@ This slogan incorporates key aspects of a book club:<br>
 - Reading books
 - Sharing thoughts and reviews
 - Connecting with others in the community
+  <br>
+## 2. 기획서
 
 - 정보 마인드맵
 
@@ -26,7 +28,7 @@ This slogan incorporates key aspects of a book club:<br>
 
 ## 2. 기술 스택 및 배포 환경
 
-Html/CSS | JavaScript | TypeScript | React | Bootstrap<br>
+Html/CSS | JavaScript | TypeScript | React | Bootstrap | Express.js<br>
 
 ## 3. github repo, url 생성
 
@@ -79,106 +81,102 @@ gantt
 
 ```mermaid
 erDiagram
+    Users {
+        integer id PK
+        varchar username
+        varchar email
+        varchar password
+        timestamp created_at
+        timestamp updated_at
+    }
+    Books {
+        integer id PK
+        varchar title
+        varchar author
+        varchar isbn
+        integer publication_year
+        timestamp created_at
+        timestamp updated_at
+    }
+    BookClubs {
+        integer id PK
+        varchar name
+        text description
+        integer creator_id FK
+        timestamp created_at
+        timestamp updated_at
+    }
+    Memberships {
+        integer id PK
+        integer user_id FK
+        integer bookclub_id FK
+        varchar role
+        timestamp created_at
+        timestamp updated_at
+    }
+    ReadingLists {
+        integer id PK
+        integer bookclub_id FK
+        integer book_id FK
+        date start_date
+        date end_date
+        timestamp created_at
+        timestamp updated_at
+    }
+    Posts {
+        integer id PK
+        varchar title
+        text content
+        integer author_id FK
+        integer bookclub_id FK
+        timestamp created_at
+        timestamp updated_at
+    }
+    Comments {
+        integer id PK
+        text content
+        integer author_id FK
+        integer post_id FK
+        timestamp created_at
+        timestamp updated_at
+    }
 
-Table Users {
-  id integer [primary key]
-  username varchar
-  email varchar
-  password varchar
-  created_at timestamp
-  updated_at timestamp
-}
-
-Table Books {
-  id integer [primary key]
-  title varchar
-  author varchar
-  isbn varchar
-  publication_year integer
-  created_at timestamp
-  updated_at timestamp
-}
-
-Table BookClubs {
-  id integer [primary key]
-  name varchar
-  description text
-  creator_id integer
-  created_at timestamp
-  updated_at timestamp
-}
-
-Table Memberships {
-  id integer [primary key]
-  user_id integer
-  bookclub_id integer
-  role varchar
-  created_at timestamp
-  updated_at timestamp
-}
-
-Table ReadingLists {
-  id integer [primary key]
-  bookclub_id integer
-  book_id integer
-  start_date date
-  end_date date
-  created_at timestamp
-  updated_at timestamp
-}
-
-Table Posts {
-  id integer [primary key]
-  title varchar
-  content text [note: 'Content of the post']
-  author_id integer
-  bookclub_id integer
-  created_at timestamp
-  updated_at timestamp
-}
-
-Table Comments {
-  id integer [primary key]
-  content text
-  author_id integer
-  post_id integer
-  created_at timestamp
-  updated_at timestamp
-}
-
-Ref: Users.id < BookClubs.creator_id
-Ref: Users.id < Memberships.user_id
-Ref: BookClubs.id < Memberships.bookclub_id
-Ref: BookClubs.id < ReadingLists.bookclub_id
-Ref: Books.id < ReadingLists.book_id
-Ref: Users.id < Posts.author_id
-Ref: BookClubs.id < Posts.bookclub_id
-Ref: Users.id < Comments.author_id
-Ref: Posts.id < Comments.post_id
+    Users ||--o{ BookClubs : "creates"
+    Users ||--o{ Memberships : "has"
+    BookClubs ||--o{ Memberships : "has"
+    BookClubs ||--o{ ReadingLists : "has"
+    Books ||--o{ ReadingLists : "included in"
+    Users ||--o{ Posts : "writes"
+    BookClubs ||--o{ Posts : "contains"
+    Users ||--o{ Comments : "writes"
+    Posts ||--o{ Comments : "has"
 ```
+
 
 <br>
 
 ## 7. 폴더구조
-
+```
 Front_MiniPj_Library/
 └── mybookclub/
-├── public/ <!-- font -->
-├── src/
-│ ├── components/ <!-- 재사용 가능한 UI컴포넌트 -->
-│ ├── contexts/ <!-- react context api 상태 관리 로직 -->
-│ ├── hooks/ <!-- react hook -->
-│ ├── routes/ <!-- route 관련 component -->
-│ │ ├── About/ <!-- 회사소개 페이지 컴포넌트 -->
-│ │ ├── BookDetail/ <!-- 책 상세 정보 페이지 컴포넌트 -->
-│ │ ├── Profile/ <!-- 사용자 프로필 페이지 컴포넌트 -->
-│ │ ├── Community/ <!-- 커뮤니티 페이지 컴포넌트 -->
-│ │ ├── LandingPage/ <!-- 메인 랜딩 페이지 컴포넌트 -->
-│ │ └── Home/ <!-- 홈페이지-->
-│ ├── services/ <!-- api -->
-│ ├── types/ <!-- type정의  -->
-│ └── styles/
-└── App.tsx
+    ├── public/
+    │   └── font/
+    ├── src/
+    │   ├── components/      # 재사용 가능한 UI 컴포넌트
+    │   ├── contexts/        # React Context API 상태 관리 로직
+    │   ├── hooks/           # React custom hooks
+    │   ├── routes/
+    │   │   ├── About/       # 회사소개 페이지 컴포넌트
+    │   │   ├── BookDetail/  # 책 상세 정보 페이지 컴포넌트
+    │   │   ├── Profile/     # 사용자 프로필 페이지 컴포넌트
+    │   │   ├── Community/   # 커뮤니티 페이지 컴포넌트
+    │   │   ├── LandingPage/ # 메인 랜딩 페이지 컴포넌트
+    │   │   └── Home/        # 홈페이지 컴포넌트
+    │   ├── services/        # API 관련 로직
+    │   ├── types/           # TypeScript 타입 정의
+    │   └── styles/          # 전역 스타일 또는 스타일 관련 파일
+    └── App.tsx              # 메인 App 컴포넌트
+```
 
 ## 8. URL 구조 및 페이지별 상세
 
@@ -191,20 +189,21 @@ Front_MiniPj_Library/
 5. 책 정보, 별점, 구매 링크, 리뷰 CRUD기능 : BookDetail
 6. 개인 정보, 작성한 리뷰 목록, 로그아웃 기능 : ProfilePage
 7. 독서 관련 토론, 질문/답변을 위한 게시판, 댓글CRUD, 대댓글CRUD 기능 : Comunity
+<br>
 
 ## 9. 느낀 점
-
-기한이 짧아 기능이 구현되지 못한 부분들에 대한 아쉬움이 남았습니다.
-npm test에 대한 부분을 빼고 가야했고 부족한 부분이 많은 프로젝트입니다.
+미니 프로젝트 기한이라고는 하지만 강의를 듣고 오후 1시간씩밖에 시간이 주어지지 않아 기능이 구현되지 못한 부분들에 대한 아쉬움이 남았습니다. <br>
+npm test에 대한 부분을 빼고 가야했고 부족한 부분이 많은 프로젝트입니다.<br>
+backend부분에 대한 수업이 진행되기 전에 진행한 프로젝트이다보니 돌아가지 않았지만 수업이 진행되면서 조금씩 덧붙일수 있었습니다. 과정이 모두 종료되면 마무리 할 예정입니다! <br>
 <br>
 
 ## 10. 트러블슈팅
-
-1. TailwindCSS is not available : 여러가지 방법으로 재설치하고 전문가에게 도움도 요청해보았으나 단순한 install문제나 설치미흡에 대한 부분이 아닌 것으로 판단되어 bootstrap을 사용하여 개발 진행
-   <br>
+*  TailwindCSS is not available : 여러가지 방법으로 재설치하고 전문가에게 도움도 요청해보았으나 단순한 install문제나 설치미흡에 대한 부분이 아닌 것으로 판단되어 bootstrap을 사용하여 개발 진행
+<br>
 
 ## 11. 저작권과 api
-
 이미지는 picsum.photos, 아이콘 파인더(로고), 교보문고(책표지)에서 가져오거나
 소장용 사진입니다.<br>
 data를 따로 만들어서 구현한 다음 네이버 api 연결했습니다.
+<br>
+<br>
