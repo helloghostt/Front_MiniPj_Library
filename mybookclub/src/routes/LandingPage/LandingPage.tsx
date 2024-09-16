@@ -20,7 +20,9 @@ const LandingPage: React.FC = () => {
       }
     } catch (error) {
       setErrorMessage(
-        error instanceof Error ? error.message : "An unexpected error occurred"
+        error instanceof Error
+          ? error.message
+          : "An unexpected error occurred during sign up"
       );
     }
   };
@@ -35,7 +37,9 @@ const LandingPage: React.FC = () => {
       }
     } catch (error) {
       setErrorMessage(
-        error instanceof Error ? error.message : "An unexpected error occurred"
+        error instanceof Error
+          ? error.message
+          : "An unexpected error occurred during login"
       );
     }
   };
@@ -44,6 +48,7 @@ const LandingPage: React.FC = () => {
     <div className="landing-page">
       <h1>Welcome to BookClub</h1>
       {errorMessage && <Alert variant="danger">{errorMessage}</Alert>}
+      {error && <Alert variant="danger">{error}</Alert>}
       <div className="form-container">
         <Form className="signup-form" onSubmit={handleSignIn}>
           <Form.Group className="email-input">

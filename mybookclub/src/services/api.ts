@@ -3,21 +3,33 @@ import { Book, Review, Post, Comment, User } from "../types";
 
 const API_URL = process.env.REACT_APP_API_URL || "http://localhost:8000/api";
 
-const NAVER_CLIENT_ID = process.env.REACT_APP_NAVER_CLIENT_ID;
-const NAVER_CLIENT_SECRET = process.env.REACT_APP_NAVER_CLIENT_SECRET;
+const NAVER_CLIENT_ID = process.env.NAVER_CLIENT_ID;
+const NAVER_CLIENT_SECRET = process.env.NAVER_CLIENT_SECRET;
 
 const axiosInstance = axios.create({
   baseURL: API_URL,
+  withCredentials: true, // This allows the browser to send cookies with cross-origin requests
 });
 
 axiosInstance.interceptors.request.use((config) => {
-  const token = localStorage.getItem("accessToken");
+  const token = document.cookie.replace(
+    /(?:(?:^|.*;\s*)accessToken\s*\=\s*([^;]*).*$)|^.*$/,
+    "$1"
+  );
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
+
+  // Add CSRF token if available
+  const csrfToken = document
+    .querySelector('meta[name="csrf-token"]')
+    ?.getAttribute("content");
+  if (csrfToken) {
+    config.headers["X-CSRF-Token"] = csrfToken;
+  }
+
   return config;
 });
-
 interface ApiClient {
   setAuthToken: (token: string) => void;
   removeAuthToken: () => void;
@@ -63,6 +75,18 @@ export const api = {
 
   removeAuthToken: () => {
     delete axiosInstance.defaults.headers.common["Authorization"];
+  },
+
+  refreshToken: async (refreshToken: string) => {
+    const response = await axiosInstance.post("/users/auth/token/refresh/", {
+      refresh: refreshToken,
+    });
+    return response.data;
+  },
+
+  logout: async () => {
+    const response = await axiosInstance.post("/users/auth/logout/");
+    return response.data;
   },
 
   login: async (email: string) => {

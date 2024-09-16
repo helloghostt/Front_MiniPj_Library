@@ -34,10 +34,7 @@ Html/CSS | JavaScript | TypeScript | React | Bootstrap<br>
 ## 3. github repo, url 생성
 
 Repo : https://github.com/helloghostt/Front_MiniPj_Library.git<br>
-
-테스트용입니다. SignIn 할 수 있습니다.<br>
-{ email: 'admin@book.club', role: 'admin' }<br>
-{ email: 'user@book.club', role: 'user' }<br>
+<https://mathdev-park.notion.site/BookClub-c855373c91684feb9f295db702f32091?pvs=4>
 
 ## 4. WBS 작성 - 업무 분류 체계
 
@@ -195,18 +192,22 @@ Front_MiniPj_Library/
 6. 개인 정보, 작성한 리뷰 목록, 로그아웃 기능 : ProfilePage
 7. 독서 관련 토론, 질문/답변을 위한 게시판, 댓글CRUD, 대댓글CRUD 기능 : Comunity
 
-## 9. 느낀 점
+## 9. 페이지구현
+
+<img src="/mybookclub/public/image/landingpage.png" width="500" height="500"/>
+
+## 10. 느낀 점
 
 기한이 짧아 기능이 구현되지 못한 부분들에 대한 아쉬움이 남았습니다.
 npm test에 대한 부분을 빼고 가야했고 부족한 부분이 많은 프로젝트입니다.
 <br>
 
-## 10. 트러블슈팅
+## 11. 트러블슈팅
 
 1. TailwindCSS is not available : 여러가지 방법으로 재설치하고 전문가에게 도움도 요청해보았으나 단순한 install문제나 설치미흡에 대한 부분이 아닌 것으로 판단되어 bootstrap을 사용하여 개발 진행
    <br>
 
-## 11. 저작권과 api
+## 12. 저작권과 api
 
 이미지는 picsum.photos, 아이콘 파인더(로고), 교보문고(책표지)에서 가져오거나
 소장용 사진입니다.<br>

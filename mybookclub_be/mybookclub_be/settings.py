@@ -173,3 +173,6 @@ AUTHENTICATION_BACKENDS = [
     "users.views.EmailBackend",
     "django.contrib.auth.backends.ModelBackend",
 ]
+
+NAVER_CLIENT_ID = os.environ.get("NAVER_CLIENT_ID")
+NAVER_CLIENT_SECRET = os.environ.get("NAVER_CLIENT_SECRET")

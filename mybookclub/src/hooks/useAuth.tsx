@@ -2,6 +2,9 @@ import { useState, useCallback, useEffect } from "react";
 import { User, AuthState } from "../types";
 import { api } from "../services/api";
 
+const TOKEN_REFRESH_INTERVAL = 5 * 60 * 1000; // 5 minutes
+const USER_INFO_REFRESH_INTERVAL = 15 * 60 * 1000; // 15 minutes
+
 export const useAuth = () => {
   const [state, setState] = useState<AuthState>({
     currentUser: null,
@@ -10,11 +13,33 @@ export const useAuth = () => {
   });
 
   useEffect(() => {
-    const token = localStorage.getItem("accessToken");
+    const token = getAccessToken();
     if (token) {
       fetchUserInfo();
+      setupTokenRefresh();
+      setupUserInfoRefresh();
     }
   }, []);
+
+  const setupTokenRefresh = () => {
+    setInterval(async () => {
+      const refreshToken = getRefreshToken();
+      if (refreshToken) {
+        try {
+          const { access } = await api.refreshToken(refreshToken);
+          setAccessToken(access);
+          api.setAuthToken(access);
+        } catch (error) {
+          console.error("Failed to refresh token:", error);
+          logout();
+        }
+      }
+    }, TOKEN_REFRESH_INTERVAL);
+  };
+
+  const setupUserInfoRefresh = () => {
+    setInterval(fetchUserInfo, USER_INFO_REFRESH_INTERVAL);
+  };
 
   const fetchUserInfo = useCallback(async () => {
     try {
@@ -40,10 +65,12 @@ export const useAuth = () => {
     setError(null);
     try {
       const { user, access, refresh } = await api.login(email);
-      localStorage.setItem("accessToken", access);
-      localStorage.setItem("refreshToken", refresh);
+      setAccessToken(access);
+      setRefreshToken(refresh);
       api.setAuthToken(access);
       setState((prev) => ({ ...prev, currentUser: user, isLoading: false }));
+      setupTokenRefresh();
+      setupUserInfoRefresh();
       return true;
     } catch (error) {
       console.error("Login error:", error);
@@ -53,11 +80,17 @@ export const useAuth = () => {
     }
   };
 
-  const logout = useCallback(() => {
-    setState({ currentUser: null, isLoading: false, error: null });
-    localStorage.removeItem("accessToken");
-    localStorage.removeItem("refreshToken");
-    api.removeAuthToken();
+  const logout = useCallback(async () => {
+    try {
+      await api.logout();
+    } catch (error) {
+      console.error("Logout error:", error);
+    } finally {
+      setState({ currentUser: null, isLoading: false, error: null });
+      removeAccessToken();
+      removeRefreshToken();
+      api.removeAuthToken();
+    }
   }, []);
 
   const isAdmin = () => state.currentUser?.role === "admin";
@@ -67,10 +100,12 @@ export const useAuth = () => {
     setError(null);
     try {
       const { user, access, refresh } = await api.signUp(email);
-      localStorage.setItem("accessToken", access);
-      localStorage.setItem("refreshToken", refresh);
+      setAccessToken(access);
+      setRefreshToken(refresh);
       api.setAuthToken(access);
       setState((prev) => ({ ...prev, currentUser: user, isLoading: false }));
+      setupTokenRefresh();
+      setupUserInfoRefresh();
       return true;
     } catch (error) {
       setError(
@@ -89,4 +124,37 @@ export const useAuth = () => {
     signUp,
     api,
   };
+};
+
+// Utility functions for token management
+const setAccessToken = (token: string) => {
+  document.cookie = `accessToken=${token}; path=/; max-age=3600; HttpOnly; Secure; SameSite=Strict`;
+};
+
+const setRefreshToken = (token: string) => {
+  document.cookie = `refreshToken=${token}; path=/; max-age=86400; HttpOnly; Secure; SameSite=Strict`;
+};
+
+const getAccessToken = () => {
+  return document.cookie.replace(
+    /(?:(?:^|.*;\s*)accessToken\s*\=\s*([^;]*).*$)|^.*$/,
+    "$1"
+  );
+};
+
+const getRefreshToken = () => {
+  return document.cookie.replace(
+    /(?:(?:^|.*;\s*)refreshToken\s*\=\s*([^;]*).*$)|^.*$/,
+    "$1"
+  );
+};
+
+const removeAccessToken = () => {
+  document.cookie =
+    "accessToken=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; HttpOnly; Secure; SameSite=Strict";
+};
+
+const removeRefreshToken = () => {
+  document.cookie =
+    "refreshToken=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT; HttpOnly; Secure; SameSite=Strict";
 };
